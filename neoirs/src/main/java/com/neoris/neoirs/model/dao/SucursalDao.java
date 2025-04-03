@@ -6,7 +6,4 @@ import com.neoris.neoirs.model.entity.Sucursal;
 import java.util.List;
 
 public interface SucursalDao extends JpaRepository<Sucursal, Integer> {
-
-    @Query("SELECT s FROM Sucursal s WHERE s.franquicia.id = :franquiciaId")
-    List<Sucursal> findByFranquiciaId(@Param("franquiciaId") Integer franquiciaId);
 }

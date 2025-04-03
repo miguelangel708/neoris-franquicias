@@ -11,8 +11,5 @@ public interface IProducto {
 
     void delete(Producto producto);
 
-    List<Producto> findTopProductsByFranquicia(Integer franquiciaId);
-
-
 
 }

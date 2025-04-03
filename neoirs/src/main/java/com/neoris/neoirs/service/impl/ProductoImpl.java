@@ -21,6 +21,8 @@ public class ProductoImpl implements IProducto {
     private ProductoDao productoDao;
     @Autowired
     private SucursalDao sucursalDao;
+
+    
     @Transactional
     @Override
     public Producto save(Producto producto){
@@ -37,14 +39,4 @@ public class ProductoImpl implements IProducto {
         productoDao.delete(producto);
     }
 
-    @Transactional
-    @Override
-    public List<Producto> findTopProductsByFranquicia(Integer franquiciaId) {
-        List<Sucursal> sucursales = sucursalDao.findByFranquiciaId(franquiciaId);
-        
-        return sucursales.stream()
-                .map(sucursal -> productoDao.findTopBySucursalOrderByStockDesc(sucursal.getId()))
-                .filter(producto -> producto != null)
-                .collect(Collectors.toList());
-    }
 }
