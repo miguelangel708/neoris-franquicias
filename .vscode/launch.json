@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-NeoirsApplication<neoirs>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.neoris.neoirs.NeoirsApplication",
+            "projectName": "neoirs",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
