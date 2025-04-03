@@ -1,10 +1,20 @@
 # Proyecto Spring Boot con Docker
 
-Este proyecto es una API desarrollada en **Spring Boot**, que se ejecuta dentro de un contenedor **Docker**.
+Este proyecto es una API desarrollada en **Spring Boot**, que se ejecuta dentro de un contenedor **Docker** y está desplegada en **AWS ECS**.
+
+## 🌐 Acceso a la API en AWS
+
+La API está disponible en la siguiente dirección:
+
+```
+http://34.225.194.123:8080/
+```
+
+Puedes realizar consultas directamente desde **Postman** o cualquier cliente HTTP.
 
 ## 🚀 Requisitos previos
 
-Antes de ejecutar el proyecto, asegúrate de tener instalado:
+Antes de ejecutar el proyecto localmente, asegúrate de tener instalado:
 
 - [Java JDK 17+](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
 - [Maven](https://maven.apache.org/download.cgi)
@@ -31,49 +41,49 @@ target/mi-api.jar
 Ejecuta el siguiente comando para construir la imagen Docker de la aplicación:
 
 ```sh
-docker build -t mi-api .
+docker build -t mi-api .  
 ```
 
-### 3️⃣ Ejecutar el contenedor
+### 3️⃣ Ejecutar el contenedor localmente
 
-Para iniciar el contenedor con la API, usa el siguiente comando:
+Para iniciar el contenedor con la API en tu máquina, usa el siguiente comando:
 
 ```sh
-docker run -p 8080:8080 mi-api
+docker run -p 8080:8080 mi-api  
 ```
 
 Esto ejecutará la aplicación en el puerto **8080**. Puedes acceder a la API en:
 
 ```
-http://localhost:8080
+http://localhost:8080  
 ```
 
-## 📂 Configuración de la base de datos con Terraform
+## 📚 Configuración de la base de datos con Terraform
 
-El proyecto incluye una carpeta llamada **terraform-mysql-rds**, donde se encuentran todos los archivos necesarios para desplegar una base de datos MySQL en **AWS** utilizando **Terraform**. 
+El proyecto incluye una carpeta llamada **terraform-mysql-rds**, donde se encuentran todos los archivos necesarios para desplegar una base de datos MySQL en **AWS** utilizando **Terraform**.
 
 Para desplegar la base de datos, sigue estos pasos:
 
 1. Accede a la carpeta `terraform-mysql-rds`:
    ```sh
-   cd terraform-mysql-rds
-   ```
+   cd terraform-mysql-rds  
+   ```  
 2. Inicializa Terraform:
    ```sh
-   terraform init
-   ```
+   terraform init  
+   ```  
 3. Revisa el plan de infraestructura:
    ```sh
-   terraform plan
-   ```
+   terraform plan  
+   ```  
 4. Aplica la configuración para desplegar la base de datos en AWS:
    ```sh
-   terraform apply
-   ```
+   terraform apply  
+   ```  
 
 Esto creará una instancia de base de datos en AWS lista para conectarse con la API. Asegúrate de configurar correctamente las variables de entorno para la conexión.
 
 ---
 
-¡Listo! Ahora puedes ejecutar tu API en Docker y desplegar la base de datos en AWS con Terraform. 🚀
+Ahora puedes acceder a la API en **AWS ECS** o ejecutarla localmente en Docker. 
 
