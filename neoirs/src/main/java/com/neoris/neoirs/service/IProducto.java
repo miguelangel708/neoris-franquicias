@@ -11,5 +11,8 @@ public interface IProducto {
 
     void delete(Producto producto);
 
+    List<Producto> findMaxStockProductBySucursalForFranquicia(String franquiciaId);
+
+
 
 }

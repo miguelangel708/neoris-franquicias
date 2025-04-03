@@ -38,5 +38,10 @@ public class ProductoImpl implements IProducto {
     public void delete(Producto producto){
         productoDao.delete(producto);
     }
-
+    
+    @Transactional
+    @Override
+    public List<Producto> findMaxStockProductBySucursalForFranquicia(String franquiciaId) {
+        return productoDao.findMaxStockProductBySucursalForFranquicia(franquiciaId);
+    }
 }

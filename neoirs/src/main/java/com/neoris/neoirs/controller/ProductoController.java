@@ -1,6 +1,7 @@
 package com.neoris.neoirs.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -90,11 +91,11 @@ public class ProductoController {
         Map<String, Object> response = new HashMap<>();
         Producto productoDelete = productoService.findById(producto.getId());
        
-        if ( productoDelete.getSucursal_id() == producto.getSucursal_id()){
-            productoService.delete(productoDelete);
-            return new ResponseEntity<>(productoDelete, HttpStatus.OK);
+        // if ( productoDelete.getSucursal_id() == producto.getSucursal_id()){
+        //     productoService.delete(productoDelete);
+        //     return new ResponseEntity<>(productoDelete, HttpStatus.OK);
 
-        }
+        // }
         
         response.put("mensaje", "no existe un producto asociado al sucursal_id ingresado");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
@@ -107,4 +108,19 @@ public class ProductoController {
     public Producto showById(@PathVariable Integer id){
         return productoService.findById(id);
     }
+
+    @GetMapping("/max-stock/{franquiciaId}")
+    public ResponseEntity<?> getMaxStockProductBySucursal(@PathVariable String franquiciaId) {
+        
+        List<Producto> productos = productoService.findMaxStockProductBySucursalForFranquicia(franquiciaId);
+        
+        if (productos.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", "No se encontraron productos para la franquicia indicada");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
+        
+        return new ResponseEntity<>(productos, HttpStatus.OK);
+    }
+
 }

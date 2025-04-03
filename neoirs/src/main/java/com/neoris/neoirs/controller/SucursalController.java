@@ -76,4 +76,6 @@ public class SucursalController {
     public Sucursal showById(@PathVariable Integer id){
         return sucursalService.findById(id);
     }
+
+    
 }
