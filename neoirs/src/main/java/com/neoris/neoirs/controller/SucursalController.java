@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.neoris.neoirs.model.entity.Franquicia;
 import com.neoris.neoirs.model.entity.Sucursal;
 import com.neoris.neoirs.service.ISucursal;
 
@@ -37,6 +38,25 @@ public class SucursalController {
         }
     }
 
+    @PutMapping("/updateName")
+    public ResponseEntity<?> updateName(@RequestBody Sucursal sucursal){
+
+        Map<String, Object> response = new HashMap<>();
+        try{
+            Sucursal sucursal_a_modificar = sucursalService.findById(sucursal.getId());
+            sucursal_a_modificar.setNombre(sucursal.getNombre());
+            Sucursal sucursal_modificado = sucursalService.save(sucursal_a_modificar);
+            return new ResponseEntity<>(sucursal_modificado, HttpStatus.CREATED);
+
+        }
+        catch(NullPointerException exDt){
+            response.put("error_message", exDt.getMessage());
+            response.put("product", null);
+            response.put("mensaje", "no existe ningún producto con el id ingresado");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+        }
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PutMapping

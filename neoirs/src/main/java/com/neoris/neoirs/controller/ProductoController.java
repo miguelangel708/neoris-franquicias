@@ -43,16 +43,63 @@ public class ProductoController {
     }
     
     @ResponseStatus(HttpStatus.CREATED)
-    @PutMapping
-    public Producto update(@RequestBody Producto producto){
-        return productoService.save(producto);
+    @PutMapping("/updateStock")
+    public ResponseEntity<?> updateStock(@RequestBody Producto producto){
+
+        Map<String, Object> response = new HashMap<>();
+        try{
+            Producto producto_a_modificar = productoService.findById(producto.getId());
+            producto_a_modificar.setStock(producto.getStock());
+            Producto producto_modificado = productoService.save(producto_a_modificar);
+            return new ResponseEntity<>(producto_modificado, HttpStatus.CREATED);
+
+        }
+        catch(NullPointerException exDt){
+            response.put("error_message", exDt.getMessage());
+            response.put("product", null);
+            response.put("mensaje", "no existe ningún producto con el id ingresado");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+        }
+    }
+
+    @PutMapping("/updateName")
+    public ResponseEntity<?> updateName(@RequestBody Producto producto){
+
+        Map<String, Object> response = new HashMap<>();
+        try{
+            Producto producto_a_modificar = productoService.findById(producto.getId());
+            producto_a_modificar.setNombre(producto.getNombre());
+            Producto producto_modificado = productoService.save(producto_a_modificar);
+            return new ResponseEntity<>(producto_modificado, HttpStatus.CREATED);
+
+        }
+        catch(NullPointerException exDt){
+            response.put("error_message", exDt.getMessage());
+            response.put("product", null);
+            response.put("mensaje", "no existe ningún producto con el id ingresado");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+        }
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id){
-        Producto productoDelete = productoService.findById(id);
-        productoService.delete(productoDelete);
+    @DeleteMapping
+    public ResponseEntity<?> delete(@RequestBody Producto producto){
+        
+        Map<String, Object> response = new HashMap<>();
+        Producto productoDelete = productoService.findById(producto.getId());
+       
+        if ( productoDelete.getSucursal_id() == producto.getSucursal_id()){
+            productoService.delete(productoDelete);
+            return new ResponseEntity<>(productoDelete, HttpStatus.OK);
+
+        }
+        
+        response.put("mensaje", "no existe un producto asociado al sucursal_id ingresado");
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+        
     }
 
     @ResponseStatus(HttpStatus.OK)
