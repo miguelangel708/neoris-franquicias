@@ -1,6 +1,7 @@
 package com.neoris.neoirs.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +39,17 @@ public class ProductoImpl implements IProducto {
     public void delete(Producto producto){
         productoDao.delete(producto);
     }
-    
+
     @Transactional
     @Override
     public List<Producto> findMaxStockProductBySucursalForFranquicia(String franquiciaId) {
         return productoDao.findMaxStockProductBySucursalForFranquicia(franquiciaId);
+    }
+
+    
+    @Transactional
+    @Override
+    public Optional<Producto> findByIdAndSucursal(Integer id, Integer sucursalId) {
+        return productoDao.findByIdAndSucursalId(id, sucursalId);
     }
 }

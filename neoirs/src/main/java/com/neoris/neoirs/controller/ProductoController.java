@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -43,65 +44,94 @@ public class ProductoController {
         }
     }
     
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)  // Cambiado de CREATED (201) a OK (200), ya que estamos actualizando
     @PutMapping("/updateStock")
-    public ResponseEntity<?> updateStock(@RequestBody Producto producto){
-
+    public ResponseEntity<?> updateStock(@RequestBody Producto producto) {
         Map<String, Object> response = new HashMap<>();
-        try{
-            Producto producto_a_modificar = productoService.findById(producto.getId());
-            producto_a_modificar.setStock(producto.getStock());
-            Producto producto_modificado = productoService.save(producto_a_modificar);
-            return new ResponseEntity<>(producto_modificado, HttpStatus.CREATED);
 
+        // Validamos que todos los datos necesarios estén presentes
+        if (producto.getId() == null || producto.getStock() == null ||
+            producto.getSucursal() == null || producto.getSucursal().getId() == null) {
+            response.put("mensaje", "El producto debe incluir un ID, un sucursal_id y un número de stock válido.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        catch(NullPointerException exDt){
-            response.put("error_message", exDt.getMessage());
-            response.put("product", null);
-            response.put("mensaje", "no existe ningún producto con el id ingresado");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 
+        Optional<Producto> productoEncontrado = productoService.findByIdAndSucursal(producto.getId(), producto.getSucursal().getId());
+
+        if (productoEncontrado.isPresent()) {
+            Producto productoActualizado = productoEncontrado.get();  // Obtenemos el producto de la base de datos
+            productoActualizado.setStock(producto.getStock());  // Actualizamos el stock
+            productoService.save(productoActualizado);  // Guardamos el producto actualizado
+            response.put("mensaje", "Stock del producto actualizado con éxito.");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("mensaje", "No se encontró un producto con el ID " + producto.getId() + " y Sucursal ID " + producto.getSucursal().getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
 
     @PutMapping("/updateName")
-    public ResponseEntity<?> updateName(@RequestBody Producto producto){
-
+    public ResponseEntity<?> updateName(@RequestBody Producto producto) {
         Map<String, Object> response = new HashMap<>();
-        try{
-            Producto producto_a_modificar = productoService.findById(producto.getId());
-            producto_a_modificar.setNombre(producto.getNombre());
-            Producto producto_modificado = productoService.save(producto_a_modificar);
-            return new ResponseEntity<>(producto_modificado, HttpStatus.CREATED);
 
+        if (producto.getId() == null || producto.getNombre() == null
+            || producto.getSucursal() == null || producto.getSucursal().getId() == null) {
+            response.put("mensaje", "El producto debe incluir un ID, un sucursal_id y un nombre válido.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-        catch(NullPointerException exDt){
-            response.put("error_message", exDt.getMessage());
-            response.put("product", null);
-            response.put("mensaje", "no existe ningún producto con el id ingresado");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 
+        Optional<Producto> productoEncontrado = productoService.findByIdAndSucursal(producto.getId(), producto.getSucursal().getId());
+
+        if (productoEncontrado.isPresent()) {
+            Producto productoActualizado = productoEncontrado.get();  // Obtenemos el objeto existente
+            productoActualizado.setNombre(producto.getNombre());  // Modificamos el nombre
+            productoService.save(productoActualizado);  // Guardamos el producto actualizado
+            response.put("mensaje", "Nombre del producto actualizado con éxito.");
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("mensaje", "No se encontró un producto con el ID " + producto.getId() + " y Sucursal ID " + producto.getSucursal().getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping
-    public ResponseEntity<?> delete(@RequestBody Producto producto){
-        
+    public ResponseEntity<?> delete(@RequestBody Producto producto) {
         Map<String, Object> response = new HashMap<>();
-        Producto productoDelete = productoService.findById(producto.getId());
-       
-        // if ( productoDelete.getSucursal_id() == producto.getSucursal_id()){
-        //     productoService.delete(productoDelete);
-        //     return new ResponseEntity<>(productoDelete, HttpStatus.OK);
 
-        // }
-        
-        response.put("mensaje", "no existe un producto asociado al sucursal_id ingresado");
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        if (producto.getId() == null || producto.getSucursal() == null || producto.getSucursal().getId() == null) {
+            response.put("mensaje", "El producto debe incluir un ID y un sucursal_id válido.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
-        
+        Optional<Producto> productoEncontrado = productoService.findByIdAndSucursal(producto.getId(), producto.getSucursal().getId());
+
+        if (productoEncontrado.isPresent()) {
+            productoService.delete(productoEncontrado.get());
+            return ResponseEntity.noContent().build(); // 204 No Content
+        } else {
+            response.put("mensaje", "No se encontró un producto con el ID " + producto.getId() + " y Sucursal ID " + producto.getSucursal().getId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
+
+
+    @GetMapping("/{id}/sucursal/{sucursalId}")
+    public ResponseEntity<?> getProductoByIdAndSucursal(@PathVariable Integer id, @PathVariable Integer sucursalId) {
+        Optional<Producto> producto = productoService.findByIdAndSucursal(id, sucursalId);
+
+        if (producto.isPresent()) {
+            return ResponseEntity.ok(producto.get());
+        } else {
+            Map<String, Object> response = new HashMap<>();
+            response.put("mensaje", "No se encontró un producto con el ID " + id + " y Sucursal ID " + sucursalId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+
 
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/{id}")
