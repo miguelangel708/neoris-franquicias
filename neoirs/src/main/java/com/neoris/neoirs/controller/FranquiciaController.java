@@ -3,6 +3,7 @@ package com.neoris.neoirs.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.neoris.neoirs.model.entity.Franquicia;
@@ -18,32 +19,29 @@ public class FranquiciaController {
     private IFranquicia franquiciaService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Franquicia create(@RequestBody Franquicia franquicia){
         System.out.println("Guardando franquicia: " + franquicia);
         return franquiciaService.save(franquicia);
     }
 
     @PutMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public Franquicia update(@RequestBody Franquicia franquicia){
         return franquiciaService.save(franquicia);
     }
 
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Integer id){
         Franquicia franquiciaDelete = franquiciaService.findById(id);
         franquiciaService.delete(franquiciaDelete);
     }
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Franquicia showById(@PathVariable Integer id){
         return franquiciaService.findById(id);
     }
 
-    @Autowired
-    private IProducto productoService;
-
-    @GetMapping("franquicia/{id}/top-products")
-    public List<Producto> getTopProductsByFranquicia(@PathVariable Integer id) {
-        return productoService.findTopProductsByFranquicia(id);
-    }
 }
