@@ -25,24 +25,44 @@ public class ProductoController {
     @Autowired
     private IProducto productoService;
 
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> create(@RequestBody Producto producto){
+    public ResponseEntity<?> create(@RequestBody Producto producto) {
 
         Map<String, Object> response = new HashMap<>();
 
-        try{
-            Producto productoRespuesta = productoService.save(producto);
-            return new ResponseEntity<>(productoRespuesta, HttpStatus.CREATED);
-
-        }catch (DataIntegrityViolationException exDt){
-            response.put("error_message", exDt.getMessage());
-            response.put("product", null);
-            response.put("mensaje", "no existe una sucursal con el sucursal_id ingresado");
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-
+        // Validamos los datos esenciales
+        if (producto.getStock() == null || 
+            producto.getSucursal() == null || 
+            producto.getSucursal().getId() == null || 
+            producto.getNombre() == null || 
+            producto.getNombre().trim().isEmpty()) {
+            
+            response.put("mensaje", "El producto debe incluir un nombre, un sucursal_id y un número de stock válido.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+
+        // Verificamos si el producto ya existe
+        Optional<Producto> productoEncontrado = productoService.findByIdAndSucursal(producto.getId(), producto.getSucursal().getId());
+
+        if (productoEncontrado.isPresent()) {
+            response.put("mensaje", "El producto con ID " + producto.getId() + " ya está registrado en la sucursal " + producto.getSucursal().getId());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }
+
+        // IMPORTANTE: Asegurar que el ID sea nulo antes de guardar
+        producto.setId(null);
+
+        // Guardamos el nuevo producto
+        Producto nuevoProducto = productoService.save(producto);
+        response.put("mensaje", "Producto creado con éxito.");
+        response.put("producto", nuevoProducto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
+
+    
     
     @ResponseStatus(HttpStatus.OK)  // Cambiado de CREATED (201) a OK (200), ya que estamos actualizando
     @PutMapping("/updateStock")
